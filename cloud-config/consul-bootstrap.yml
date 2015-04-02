@@ -1,0 +1,26 @@
+#cloud-config
+# Cloud config for consul servers 
+
+write_files:
+  - path: /etc/consul.d/config.json
+  	permissions: '0755'
+    content: |
+    {
+	    "bootstrap_expect": 1,
+	    "server": true,
+	    "datacenter": "dc1",
+	    "data_dir": "/var/consul",
+	    "log_level": "INFO",
+	    "enable_syslog": true
+	}
+
+runcmd:
+  # Install consul
+  - sudo groupadd consul 
+  - sudo useradd -gconsul consul
+  - sudo apt-get install unzip
+  - curl -L -o consul.zip -v "https://dl.bintray.com/mitchellh/consul/0.5.0_linux_amd64.zip"
+  - sudo mv consul /usr/bin/consul 
+  - sudo mkdir -p /var/consul
+  - sudo chown -R consul:consul /var/consul
+  - sudo chmod 755 /var/consul

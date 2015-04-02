@@ -1,0 +1,29 @@
+/* App servers */
+resource "aws_instance" "ecs" {
+  count = 1
+  ami = "ami-801544e8" #amzn-ami-2014.09.1-amazon-ecs-optimized-preview3 / us-east-1 
+  iam_instance_profile = "AmazonECSContainerInstanceRole"
+  instance_type = "t2.micro"
+  subnet_id = "${aws_subnet.private.id}"
+  security_groups = ["${aws_security_group.default.id}"]
+  key_name = "${aws_key_pair.deployer.key_name}"
+  #source_dest_check = false
+  #user_data = "${file(\"cloud-config/app.yml\")}"
+  tags = { 
+    Name = "${var.project}-ecs-${count.index}"    
+  }
+}
+
+/* Load balancer */
+resource "aws_elb" "ecs" {
+  name = "${var.project}-ecs-elb"
+  subnets = ["${aws_subnet.public.id}"]
+  security_groups = ["${aws_security_group.default.id}", "${aws_security_group.web.id}"]
+  listener {
+    instance_port = 80
+    instance_protocol = "http"
+    lb_port = 80
+    lb_protocol = "http"
+  }
+  instances = ["${aws_instance.ecs.*.id}"]
+}

@@ -1,0 +1,31 @@
+{
+  "containerDefinitions": [
+    {
+      "name": "go-app",
+      "image": "alars/busybox-go-webapp",
+      "essential": true,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 80
+        }
+      ],
+      "memory": 500,
+      "cpu": 10
+    },
+    {
+      "environment": [
+        {
+          "name": "MYSQL_ROOT_PASSWORD",
+          "value": "password"
+        }
+      ],
+      "name": "mysql",
+      "image": "mysql",
+      "cpu": 10,
+      "memory": 500,
+      "essential": true
+    }
+  ],
+  "family": "hello_world"
+}
